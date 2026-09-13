@@ -7,77 +7,91 @@ import {
   Menu,
   X,
   Leaf,
-  Scale,
-  Users,
   FileText,
+  FileBarChart,
   GraduationCap,
-  Heart,
+  Store,
+  Building2,
+  PartyPopper,
   Recycle,
+  Filter,
   BarChart3,
   CheckCircle2,
   ClipboardList,
   Lightbulb,
   Cog,
   TrendingUp,
+  Search,
+  Handshake,
+  Clock,
   ArrowRight,
   ChevronRight,
 } from "lucide-react";
 
 // import heroImage from "@assets/stock_images/professional_office__2c521617.jpg";
-import heroImage from "@assets/stock_images/ila-green-landing-bg-large.png";
-import schoolProgramImage from "@assets/stock_images/students_children_le_afaa148a.jpg";
-import volunteerImage from "@assets/stock_images/volunteers_community_4e3ac343.jpg";
-import ewasteImage from "@assets/stock_images/recycling_bins_waste_b93d8db1.jpg";
+import heroImageDesktop from "@assets/stock_images/ila-green-landing-bg-large.png";
+import heroImageMobile from "@assets/stock_images/ila-green-landing-bg-mobile.png";
 
-function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
-  const [count, setCount] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+function CountUpNumber({
+  value,
+  decimals = 0,
+  prefix = "",
+  suffix = "",
+  duration = 1600,
+}: {
+  value: number;
+  decimals?: number;
+  prefix?: string;
+  suffix?: string;
+  duration?: number;
+}) {
+  const [display, setDisplay] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (!startOnView) {
-      setHasStarted(true);
-    }
-  }, [startOnView]);
+    const node = ref.current;
+    if (!node) return;
 
-  useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasStarted) {
-          setHasStarted(true);
+        if (entry.isIntersecting) {
+          setHasAnimated(true);
+          observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.4 }
     );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
+    observer.observe(node);
     return () => observer.disconnect();
-  }, [hasStarted]);
+  }, []);
 
   useEffect(() => {
-    if (!hasStarted) return;
+    if (!hasAnimated) return;
 
-    let startTime: number;
-    let animationFrame: number;
+    let frame: number;
+    const start = performance.now();
 
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * end));
-
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(value * eased);
       if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
+        frame = requestAnimationFrame(tick);
       }
     };
 
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [end, duration, hasStarted]);
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [hasAnimated, value, duration]);
 
-  return { count, ref };
+  return (
+    <span ref={ref}>
+      {prefix}
+      {display.toFixed(decimals)}
+      {suffix}
+    </span>
+  );
 }
 
 function Navigation() {
@@ -108,7 +122,7 @@ function Navigation() {
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 lg:px-6">
         <nav className="flex items-center justify-between gap-4 h-16 md:h-20">
           <a
             href="#"
@@ -145,10 +159,8 @@ function Navigation() {
             >
               Pilot Engagements
             </button> */}
-            <Link href="/faq">
-              <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-faq">
-                FAQ
-              </a>
+            <Link href="/faq" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-faq">
+              FAQ
             </Link>
             <Button
               onClick={() => scrollToSection("contact")}
@@ -193,10 +205,8 @@ function Navigation() {
             >
               Pilot Engagements
             </button> */}
-            <Link href="/faq">
-              <a className="block w-full text-left px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors" data-testid="link-faq-mobile">
-                FAQ
-              </a>
+            <Link href="/faq" className="block w-full text-left px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors" data-testid="link-faq-mobile">
+              FAQ
             </Link>
             <Button
               className="w-full mt-2"
@@ -213,69 +223,87 @@ function Navigation() {
 }
 
 function HeroSection() {
-  
-
   return (
-    <section className="relative min-h-[500px] md:min-h-[600px] lg:min-h-[700px] flex items-center overflow-hidden">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      />
-      <div className="absolute inset-0 bg-black/30" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-      
-      <div className="relative max-w-7xl px-4 md:px-6 lg:px-8 py-16 md:py-20 lg:py-24">
-        <div className="max-w-5xl text-left">
-          <Badge className="mb-4 md:mb-6 bg-white/10 text-white border-white/20 backdrop-blur-md" data-testid="badge-trust">
-            <Leaf className="w-3 h-3 mr-1" />
-            Delhi NCR's Execution-Led Circular Waste Management Partner
-          </Badge>
+    <section className="relative overflow-hidden">
+      {/* Image layer. Mobile: a plain `height` bounded by clamp() — tied to viewport height, not
+          image aspect ratio, and floored/capped so text always has room in the first viewport.
+          (Two earlier approaches were both broken: `aspect-ratio` + `max-height` together make
+          Chrome shrink the box's WIDTH to preserve the ratio once height is capped; and a
+          padding-top-percentage box can't be capped by max-height at all, since padding always
+          wins over height/max-height regardless of the box's specified height.)
+          Desktop: padding-top hack reproduces the image's native ratio exactly, uncropped.
+          Mobile crop is anchored to the bottom of the source image (object-bottom) so what's
+          cut off is the empty sky at the top, not the monument/volunteers lower in the frame. */}
+      <div className="relative w-full h-[clamp(420px,78svh,620px)] md:h-0 md:pt-[56.27%]">
+        <picture>
+          <source media="(min-width: 768px)" srcSet={heroImageDesktop} />
+          <img
+            src={heroImageMobile}
+            alt="ILA Green waste management operations"
+            className="absolute inset-0 w-full h-full object-cover object-bottom"
+            loading="eager"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:hidden" />
+        <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+      </div>
 
-          <h1
-            className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-4 md:mb-6 text-white"
-            data-testid="text-hero-headline"
-          >
-            Measured Waste Reduction{" "}
-            <br />
-            <span className="text-green-400">Credible Evidence-backed Impact</span>
-          </h1>
+      <div className="absolute inset-0 flex items-end md:items-center">
+        <div className="relative w-full max-w-screen-2xl mx-auto px-3 sm:px-4 lg:px-6 py-10 md:py-20 lg:py-24">
+          <div className="max-w-5xl text-left">
+            <Badge className="mb-4 md:mb-6 bg-white/10 text-white border-white/20 backdrop-blur-md" data-testid="badge-trust">
+              <Leaf className="w-3 h-3 mr-1 flex-shrink-0" />
+              <span className="sm:hidden">Delhi NCR Waste Management Partner</span>
+              <span className="hidden sm:inline">Delhi NCR's Execution-Led Circular Waste Management Partner</span>
+            </Badge>
 
-          <p
-            className="text-lg md:text-xl text-white/90 max-w-2xl mb-6 md:mb-8"
-            data-testid="text-hero-subheadline"
-          >
-            Circular waste management and ESG sustainable solutions.
-            {/* We focus on supporting organisations with audit, recover and measure waster through evidence-backed operational systems. */}
-            {/* Execution-led waste audits and ESG reporting for Delhi NCR organisations.
-            We focus on measurable & practical interventions at the source, not
-            theoretical sustainability claims. */}
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button
-              size="lg"
-              className="text-lg px-8"
-              onClick={() => {
-                const element = document.getElementById("contact");
-                if (element) element.scrollIntoView({ behavior: "smooth" });
-              }}
-              data-testid="button-hero-cta"
+            <h1
+              className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-4 md:mb-6 text-white"
+              data-testid="text-hero-headline"
             >
-              Request Engagement
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-lg px-8 bg-white/10 text-white border-white/30 backdrop-blur-md hover:bg-white/20"
-              onClick={() => {
-                const element = document.getElementById("process");
-                if (element) element.scrollIntoView({ behavior: "smooth" });
-              }}
-              data-testid="button-hero-secondary"
+              Measured Waste Reduction{" "}
+              <br />
+              <span className="text-green-400">Credible Evidence-backed Impact</span>
+            </h1>
+
+            <p
+              className="text-lg md:text-xl text-white/90 max-w-2xl mb-6 md:mb-8"
+              data-testid="text-hero-subheadline"
             >
-              How We Work
-            </Button>
+              Circular waste management and ESG sustainable solutions.
+              {/* We focus on supporting organisations with audit, recover and measure waster through evidence-backed operational systems. */}
+              {/* Execution-led waste audits and ESG reporting for Delhi NCR organisations.
+              We focus on measurable & practical interventions at the source, not
+              theoretical sustainability claims. */}
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                size="lg"
+                className="text-lg px-8"
+                onClick={() => {
+                  const element = document.getElementById("contact");
+                  if (element) element.scrollIntoView({ behavior: "smooth" });
+                }}
+                data-testid="button-hero-cta"
+              >
+                Request Engagement
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-8 bg-white/10 text-white border-white/30 backdrop-blur-md hover:bg-white/20"
+                onClick={() => {
+                  const element = document.getElementById("process");
+                  if (element) element.scrollIntoView({ behavior: "smooth" });
+                }}
+                data-testid="button-hero-secondary"
+              >
+                How We Work
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -286,7 +314,7 @@ function HeroSection() {
   );
 }
 
-function ImpactMetrics() {
+function ImpactIntroSection() {
   return (
     <section className="py-16 md:py-20 bg-card">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
@@ -302,7 +330,7 @@ function ImpactMetrics() {
   );
 }
 
-function ServicesSection() {
+function WhyIlaGreenSection() {
   const services = [
     {
       icon: ClipboardList,
@@ -325,7 +353,7 @@ function ServicesSection() {
       ],
     },
     {
-      icon: TrendingUp,
+      icon: Filter,
       title: "Structured Segregation and Recycling",
       description: "On-site segregation supported by trained project workers. Recyclable waste channeled through verified vendors with statutory registrations.",
       features: [
@@ -365,41 +393,37 @@ function ServicesSection() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           <div className="text-center" data-testid="metric-waste">
-            {/* <Scale className="w-8 h-8 text-primary mx-auto mb-3" /> */}
-            <div className="text-4xl md:text-5xl font-bold text-foreground mb-1">
-              210.8 kg
+            <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-1">
+              <CountUpNumber value={210.8} decimals={1} suffix=" kg" />
             </div>
             <div className="text-sm md:text-base text-muted-foreground font-medium">
               Total Waste Collected
             </div>
           </div>
-          
-          <div className="text-center" data-testid="metric-people">
-            {/* <Users className="w-8 h-8 text-primary mx-auto mb-3" /> */}
-            <div className="text-4xl md:text-5xl font-bold text-foreground mb-1">
-              32.3 kg
+
+          <div className="text-center" data-testid="metric-recyclables">
+            <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-1">
+              <CountUpNumber value={32.3} decimals={1} suffix=" kg" />
             </div>
             <div className="text-sm md:text-base text-muted-foreground font-medium">
               Total Recyclables Segregated
             </div>
           </div>
-          
-          <div className="text-center" data-testid="metric-companies">
-            {/* <Heart className="w-8 h-8 text-primary mx-auto mb-3" /> */}
-            <div className="text-4xl md:text-5xl font-bold text-foreground mb-1">
-              +56.2%
+
+          <div className="text-center" data-testid="metric-recovery-rate">
+            <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-1">
+              <CountUpNumber value={56.2} decimals={1} prefix="+" suffix="%" />
             </div>
             <div className="text-sm md:text-base text-muted-foreground font-medium">
               Relative Improvement in Recovery Rate
             </div>
           </div>
 
-          <div className="text-center" data-testid="metric-people">
-            {/* <Users className="w-8 h-8 text-primary mx-auto mb-3" /> */}
-            <div className="text-4xl md:text-5xl font-bold text-foreground mb-1">
-              11.57 kg/hr
+          <div className="text-center" data-testid="metric-recovery-hour">
+            <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-1">
+              <CountUpNumber value={11.57} decimals={2} suffix=" kg/hr" />
             </div>
             <div className="text-sm md:text-base text-muted-foreground font-medium">
               Average Recyclables Recovered per Operating Hour
@@ -448,7 +472,7 @@ function ServicesSection() {
 function WhoWeWorkWithSection() {
   const clientTypes = [
     {
-      icon: Users,
+      icon: Building2,
       title: "Corporate Offices & IT Parks",
       description: "Business parks, corporate campuses, and co-working spaces looking to reduce landfill dependency and meet ESG reporting requirements.",
     },
@@ -458,12 +482,12 @@ function WhoWeWorkWithSection() {
       description: "Schools, colleges, and universities seeking to implement sustainable waste management practices.",
     },
     {
-      icon: Heart,
+      icon: Store,
       title: "Retail & Commercial Establishments",
       description: "Retail chains and commercial venues preparing for ESG disclosures and stakeholder reporting.",
     },
     {
-      icon: Recycle,
+      icon: PartyPopper,
       title: "Corporate Events & Concerts",
       description: "Event organizers and venues aiming to minimize waste and demonstrate sustainability impact through measurable outcomes.",
     },
@@ -691,33 +715,33 @@ function ProcessSection() {
   const steps = [
     {
       number: "01",
-      icon: Lightbulb,
+      icon: Search,
       title: "Understand",
-      description: "1. Waste generation \n 2. Waste streams 3. Collection points 4. Waste movement 5. Stakeholders",
+      points: ["Waste generation", "Waste streams", "Collection points", "Waste movement", "Stakeholders"],
     },
     {
       number: "02",
-      icon: ClipboardList,
+      icon: Lightbulb,
       title: "Waste Strategy",
-      description: "1. Segregation plan 2. Colour coding 3. Signage 4. SoPs 5. Collection route",
+      points: ["Segregation plan", "Colour coding", "Signage", "SoPs", "Collection route"],
     },
     {
       number: "03",
       icon: Cog,
       title: "Operate",
-      description: "1. Collection 2. Segregation 3. Quality checks 4. Weighing",
+      points: ["Collection", "Segregation", "Quality checks", "Weighing"],
     },
     {
       number: "04",
-      icon: FileText,
+      icon: Handshake,
       title: "Coordinate",
-      description: "1. Aggregator 2. Recycler 3. MCD / DDA 4. EPR partners",
+      points: ["Aggregator", "Recycler", "MCD / DDA", "EPR partners"],
     },
     {
       number: "05",
-      icon: ClipboardList,
+      icon: FileBarChart,
       title: "Reporting",
-      description: "1. Dashboard 2. Evidence 3. Impact 4. Recommendations",
+      points: ["Dashboard", "Evidence", "Impact", "Recommendations"],
     },
   ];
 
@@ -743,7 +767,7 @@ function ProcessSection() {
               </span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
               <span className="flex items-center gap-1">
-                <Cog className="w-4 h-4 text-primary" />
+                <Lightbulb className="w-4 h-4 text-primary" />
                 Design
               </span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -758,7 +782,7 @@ function ProcessSection() {
               </span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
               <span className="flex items-center gap-1">
-                <FileText className="w-4 h-4 text-primary" />
+                <FileBarChart className="w-4 h-4 text-primary" />
                 Report
               </span>
             </div>
@@ -768,87 +792,29 @@ function ProcessSection() {
         <div className="relative">
           <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-border -translate-y-1/2" />
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
             {steps.map((step, index) => (
               <div key={step.number} className="relative" data-testid={`step-${index}`}>
-                <Card className="p-6 text-center relative z-10 h-full hover:shadow-lg transition-shadow">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground font-bold text-lg mb-4">
-                    {step.number}
+                <Card className="p-5 sm:p-6 text-left sm:text-center relative z-10 h-full hover:shadow-lg transition-shadow">
+                  <div className="flex items-center gap-3 mb-3 sm:flex-col sm:gap-0 sm:mb-0">
+                    <div className="inline-flex items-center justify-center w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-primary text-primary-foreground font-bold text-sm sm:text-lg sm:mb-4 flex-shrink-0">
+                      {step.number}
+                    </div>
+                    <step.icon className="w-6 h-6 sm:w-8 sm:h-8 text-primary sm:mx-auto sm:mb-3 flex-shrink-0" />
+                    <h3 className="text-base sm:text-xl font-semibold sm:mb-3">{step.title}</h3>
                   </div>
-                  <step.icon className="w-8 h-8 text-primary mx-auto mb-3" />
-                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  <ul className="text-sm text-muted-foreground space-y-1.5 text-left">
+                    {step.points.map((point, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </Card>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FAQSection() {
-  const faqs = [
-    {
-      q: "Can your reports be used in ESG disclosures or annual reports?",
-      a: "Yes. Our reports are structured to support internal ESG reporting, sustainability disclosures, and stakeholder communication. All data is supported by on-ground measurement and vendor documentation."
-    },
-    {
-      q: "Is this work eligible under India's CSR framework?",
-      a: "ILA Green's interventions support environmental sustainability objectives aligned with Schedule VII of the Companies Act, subject to how the client integrates outcomes into their broader CSR strategy. Final applicability rests with the client's CSR committee and auditors."
-    },
-    {
-      q: "How is the data collected and verified?",
-      a: "Data is collected through on-site audits, waste segregation, and weight-based measurement. It is cross-verified with vendor processing confirmations and internal validation checks."
-    },
-    {
-      q: "Will this disrupt our daily operations?",
-      a: "No. Audits and segregation are planned to minimise disruption. Engagements are designed to integrate with existing workflows wherever possible."
-    },
-    {
-      q: "Do you handle e-waste?",
-      a: "No. ILA Green does not handle e-waste or e-waste reporting."
-    },
-    {
-      q: "How long does an engagement last?",
-      a: "Engagements are typically scope-defined (One Time/ Monthly/ Annual). Timelines are agreed upfront based on site size, waste profile, and demand."
-    },
-    {
-      q: "Do you guarantee zero landfill waste?",
-      a: "No. We work towards maximum landfill diversion that is practically achievable for each site. All outcomes are reported transparently."
-    },
-    {
-      q: "What about pricing and commercials?",
-      // a: "Commercials are defined based on site size, waste profile, duration, and reporting requirements. Pilot engagements are offered at a reduced scope-based commercial model."
-      a: "Commercials are defined based on site size, waste profile, duration, and reporting requirements."
-    }
-  ];
-
-  return (
-    <section id="faq" className="py-16 md:py-20 lg:py-24 bg-muted/30 scroll-mt-20">
-      <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Clear answers to common questions about our services and approach
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {faqs.map((faq, index) => (
-            <Card key={index} className="p-6 md:p-8">
-              <h3 className="font-semibold text-lg mb-3 flex items-start gap-2">
-                <span className="text-primary mt-1">Q{index + 1}.</span>
-                {faq.q}
-              </h3>
-              <p className="text-muted-foreground pl-8">
-                {faq.a}
-              </p>
-            </Card>
-          ))}
         </div>
       </div>
     </section>
@@ -995,7 +961,7 @@ function ContactSection() {
 
               <Card className="p-4 bg-background">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-primary" />
+                  <Clock className="w-5 h-5 text-primary" />
                   Response Time
                 </h4>
                 <p className="text-sm text-muted-foreground ml-7">
@@ -1015,7 +981,10 @@ function ContactSection() {
             <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
             
             <div className="space-y-6">
-              <div className="flex items-start gap-4">
+              <a
+                href="tel:+919654129577"
+                className="group flex items-start gap-4 -m-2 p-2 rounded-lg hover:bg-muted/60 transition-colors"
+              >
                 <div className="p-3 bg-primary/10 rounded-lg">
                   <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -1023,13 +992,16 @@ function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Phone</h4>
-                  <a href="tel:+919654129577" className="text-muted-foreground hover:text-primary transition-colors">
+                  <span className="text-muted-foreground group-hover:text-primary transition-colors">
                     +91 9654129577
-                  </a>
+                  </span>
                 </div>
-              </div>
+              </a>
 
-              <div className="flex items-start gap-4">
+              <a
+                href="mailto:info@ilagreen.com"
+                className="group flex items-start gap-4 -m-2 p-2 rounded-lg hover:bg-muted/60 transition-colors"
+              >
                 <div className="p-3 bg-primary/10 rounded-lg">
                   <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -1037,13 +1009,18 @@ function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Email</h4>
-                  <a href="mailto:info@ilagreen.com" className="text-muted-foreground hover:text-primary transition-colors break-all">
+                  <span className="text-muted-foreground group-hover:text-primary transition-colors break-all">
                     info@ilagreen.com
-                  </a>
+                  </span>
                 </div>
-              </div>
+              </a>
 
-              <div className="flex items-start gap-4">
+              <a
+                href="https://www.linkedin.com/in/ilagreen/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-4 -m-2 p-2 rounded-lg hover:bg-muted/60 transition-colors"
+              >
                 <div className="p-3 bg-primary/10 rounded-lg">
                   <svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -1051,16 +1028,11 @@ function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">LinkedIn</h4>
-                  <a 
-                    href="https://www.linkedin.com/in/ilagreen/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors break-all"
-                  >
+                  <span className="text-muted-foreground group-hover:text-primary transition-colors break-all">
                     linkedin.com/in/ilagreen
-                  </a>
+                  </span>
                 </div>
-              </div>
+              </a>
 
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-primary/10 rounded-lg">
@@ -1102,18 +1074,18 @@ function Footer() {
               Reducing landfill burden through measured action. */}
             </p>
             <div className="space-y-2 text-sm">
-              <p className="flex items-center gap-2">
+              <a href="tel:+919654129577" className="flex items-center gap-2 hover:text-primary transition-colors">
                 <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <a href="tel:+919654129577" className="hover:text-primary transition-colors">+91 9654129577</a>
-              </p>
-              <p className="flex items-center gap-2">
+                +91 9654129577
+              </a>
+              <a href="mailto:info@ilagreen.com" className="flex items-center gap-2 hover:text-primary transition-colors">
                 <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <a href="mailto:info@ilagreen.com" className="hover:text-primary transition-colors">info@ilagreen.com</a>
-              </p>
+                info@ilagreen.com
+              </a>
             </div>
           </div>
           
@@ -1134,7 +1106,7 @@ function Footer() {
               <li><button onClick={() => document.getElementById('services')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-primary transition-colors">Why ILA Green</button></li>
               <li><button onClick={() => document.getElementById('process')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-primary transition-colors">How We Work</button></li>
               {/* <li><button onClick={() => document.getElementById('pilot')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-primary transition-colors">Pilot Engagements</button></li> */}
-              <li><Link href="/faq"><a className="hover:text-primary transition-colors">FAQ</a></Link></li>
+              <li><Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
               <li><button onClick={() => document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'})} className="hover:text-primary transition-colors">Contact</button></li>
             </ul>
           </div>
@@ -1160,13 +1132,26 @@ function Footer() {
 }
 
 export default function Home() {
+  useEffect(() => {
+    // Jump instantly rather than animate: an in-progress smooth scroll can be
+    // stalled by the metrics count-up reflowing text in the sections it scrolls past.
+    if (window.location.hash) {
+      const target = document.getElementById(window.location.hash.slice(1));
+      if (target) {
+        target.scrollIntoView({ behavior: "auto", block: "start" });
+        return;
+      }
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <main>
         <HeroSection />
-        <ImpactMetrics />
-        <ServicesSection />
+        <ImpactIntroSection />
+        <WhyIlaGreenSection />
         <WhoWeWorkWithSection />
         {/* <WhyChooseSection /> */}
         <ProcessSection />

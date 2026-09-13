@@ -8,14 +8,12 @@ function Navigation() {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <nav className="flex items-center justify-between gap-4 h-16 md:h-20">
-          <Link href="/">
-            <a className="flex items-center gap-2" aria-label="Ila Green home">
-              <img
-                src="/Logo.png"
-                alt="Ila Green"
-                className="w-32 h-32 object-contain"
-              />
-            </a>
+          <Link href="/" className="flex items-center gap-2" aria-label="Ila Green home">
+            <img
+              src="/Logo.png"
+              alt="Ila Green"
+              className="w-32 h-32 object-contain"
+            />
           </Link>
 
           <Link href="/">
