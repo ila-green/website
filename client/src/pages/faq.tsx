@@ -53,8 +53,8 @@ export default function FAQPage() {
       a: "No. ILA Green does not handle e-waste or e-waste reporting."
     },
     {
-      q: "How long does a pilot engagement last?",
-      a: "Pilot engagements are typically short-term and scope-defined. Timelines are agreed upfront based on site size and waste profile."
+      q: "How long does an engagement last?",
+      a: "Engagements are typically scope-defined (One-time/ Monthly/ Annual). Timelines are agreed upfront based on site size, waste profile, and demand."
     },
     {
       q: "Do you guarantee zero landfill waste?",
@@ -62,7 +62,7 @@ export default function FAQPage() {
     },
     {
       q: "What about pricing and commercials?",
-      a: "Commercials are defined based on site size, waste profile, duration, and reporting requirements. Pilot engagements are offered at a reduced scope-based commercial model."
+      a: "Commercials are defined based on site size, waste profile, duration, and reporting requirements."
     }
   ];
 
